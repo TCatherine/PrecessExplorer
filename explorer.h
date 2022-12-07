@@ -19,6 +19,8 @@
 #include <imagehlp.h>
 
 #include "pe_signature_verifier.h"
+#include "GetIpInfo.h"
+#include "netstat.h"
 
 // Link with the Wintrust.lib file.
 #pragma comment (lib, "wintrust")
@@ -29,5 +31,5 @@ std::string is_packed(std::string file_name);
 std::string getRWX(DWORD processId);
 std::string isRWX(DWORD processId);
 void process_page(DWORD pid);
-
+void get_section(DWORD pid, std::string path);
 void main_page();

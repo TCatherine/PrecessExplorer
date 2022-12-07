@@ -1,8 +1,8 @@
 #include "explorer.h"
 
 void show_main() {
-    VariadicTable<std::string, DWORD, std::string, std::string, std::string>
-        vt({ "Name", "PID", "Verified", "Packed", "RWX" });
+    VariadicTable<std::string, DWORD, std::string, std::string, std::string, std::string>
+        vt({ "Name", "PID", "Verified", "Packed", "RWX", "Net"});
     PeSignatureVerifier checker = PeSignatureVerifier();
 
     DWORD aProcesses[1024], cbNeeded, cProcesses;
@@ -12,7 +12,7 @@ void show_main() {
     EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded);
 
     cProcesses = cbNeeded / sizeof(DWORD);
-    for (i = 0; i < cProcesses && i < 10; i++)
+    for (i = 0; i < cProcesses && i < 20; i++)
         if (aProcesses[i] != 0)
         {
             std::string path = getName(aProcesses[i]);
@@ -25,7 +25,9 @@ void show_main() {
 
             std::string packed_res = is_packed(path);
             std::string rwx_res = isRWX(aProcesses[i]);
-            vt.addRow(name, aProcesses[i], ver, packed_res, rwx_res);
+            std::string ip = is_net(aProcesses[i]);
+           // std::string ip = GetIpInfo(aProcesses[i]);
+            vt.addRow(name, aProcesses[i], ver, packed_res, rwx_res, ip);
         }
 
     system("cls");
