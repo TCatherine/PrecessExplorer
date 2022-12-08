@@ -33,3 +33,5 @@ std::string isRWX(DWORD processId);
 void process_page(DWORD pid);
 void get_section(DWORD pid, std::string path);
 void main_page();
+std::string is_eq(DWORD pid, std::string path);
+void show_entropy(std::string path);
