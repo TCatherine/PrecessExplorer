@@ -20,15 +20,26 @@ void show_net(DWORD pid) {
     info.num = 0;
 
     get_tcp_info(pid, info);
-    get_udp_info(pid);
-    if (info.num)
+    NetStatistic udp_info = get_udp_info(pid);
+    if (info.num || udp_info.num)
         printf(" PR %-23s %-23s %-12s %-12s %s\n", "SRC ADDR", "DST ADDR", "State", "Owner PID", "Mode");
     else
         std::cout << "Network address doesn't found!" << std::endl;
     for (int i = 0; i < info.num; i++)
     {
         if (!info.table[i].remoteInfo.empty() && info.table[i].remoteInfo != "0.0.0.0:0") {
+            std::cout << "----------------------------------------------------------------------------------------------------" << std::endl;
+            std::cout << "DESTINATIONN IP: " << info.table[i].remoteInfo << std::endl;
             std::string ip = info.table[i].remoteInfo.substr(0, info.table[i].remoteInfo.find_last_of(":"));
+            std::cout << GetIpInfo(ip.c_str()) << std::endl;
+        }
+    }
+    for (int i = 0; i < udp_info.num; i++)
+    {
+        if (!udp_info.table[i].remoteInfo.empty() && udp_info.table[i].remoteInfo != "0.0.0.0:0" && udp_info.table[i].remoteInfo != "*:*") {
+            std::cout << "----------------------------------------------------------------------------------------------------" << std::endl;
+            std::cout << "DESTINATIONN IP: " << udp_info.table[i].remoteInfo << std::endl;
+            std::string ip = udp_info.table[i].remoteInfo.substr(0, udp_info.table[i].remoteInfo.find_last_of(":"));
             std::cout << GetIpInfo(ip.c_str()) << std::endl;
         }
     }
@@ -71,8 +82,21 @@ void show_process(DWORD pid) {
     std::cout << "----------------------------------------------------------------------------------------------------" << std::endl;
     show_net(pid);
     std::cout << "----------------------------------------------------------------------------------------------------" << std::endl;
-    //show_mitre_attack(path);
     get_section(pid, path);
+    std::cout << "----------------------------------------------------------------------------------------------------" << std::endl;
+    
+    std::cout << "Display MITRE ATTACK? [Y/N] " << std::endl;
+    std::cout << "> ";
+
+    std::string command;
+    std::cin >> command;
+    if (command == "y" || command=="Y") {
+        show_mitre_attack(path);
+    }
+
+    return;
+
+    
 
 }
 

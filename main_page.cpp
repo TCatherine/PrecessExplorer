@@ -20,8 +20,8 @@ void init(HANDLE hProcess) {
 }
 
 void show_main() {
-    VariadicTable<std::string, DWORD, std::string, std::string, std::string, std::string, std::string>
-        vt({ "Name", "PID", "Verified", "Packed", "RWX", "Net", "Modified"});
+    VariadicTable<std::string, DWORD, std::string, std::string, std::string, std::string, std::string, std::string >
+        vt({ "Name", "PID", "Verified", "Packed", "RWX", "Net", "Modified", "Malware"});
     PeSignatureVerifier checker = PeSignatureVerifier();
 
     DWORD aProcesses[1024], cbNeeded, cProcesses;
@@ -53,23 +53,46 @@ void show_main() {
 
     std::sort(pr.begin(), pr.end());
 
-    for (int i = pr.size() - 1, j = 0; i >= 0 && j < 10; i--, j++)
+    for (int i = pr.size() - 1, j = 0; i >= 0 && j < 20; i--, j++)
         if (pr[i].second != 0)
         {
+            int is_malware = 0;
             std::string path = getName(pr[i].second);
             std::string name = path.substr(path.find_last_of("\\") + 1);
 
             DWORD lRetVal = PeSignatureVerifier::CheckFileSignature(std::wstring(path.begin(), path.end()));
-            std::string ver = "Unsigned";
-            if (lRetVal == ERROR_SUCCESS)
-                ver = "Signed";
+            std::string ver = "Signed";
+            if (lRetVal != ERROR_SUCCESS) {
+                ver = "Unsigned";
+                is_malware += 11;
+            }
 
             std::string packed_res = is_packed(path);
+            if (packed_res == "Packed")
+                is_malware += 1;
+            //std::string packed_res = "";
+
             std::string rwx_res = isRWX(pr[i].second);
+            if (rwx_res == "Detect")
+                is_malware += 1;
+
             std::string ip = is_net(pr[i].second);
-            std::string is_not_eq = "False";
-            //std::string is_not_eq = is_eq(aProcesses[i], path);
-            vt.addRow(name, pr[i].second, ver, packed_res, rwx_res, ip, is_not_eq);
+            if (ip == "True")
+                is_malware += 1;
+
+            std::string is_not_eq = is_eq(pr[i].second, path);
+            if (is_not_eq == "False") {
+                is_malware += 1;
+            }
+
+            std::string malware = "";
+            if (is_malware >= 14)
+                malware = "Yes!!!";
+            if (is_malware >= 11)
+                malware = "Maybe";
+
+
+            vt.addRow(name, pr[i].second, ver, packed_res, rwx_res, ip, is_not_eq, malware);
             system("cls");
             vt.print(std::cout);
         }
