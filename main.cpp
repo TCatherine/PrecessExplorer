@@ -60,6 +60,7 @@ BOOL EnableDebugPrivilages()
 
 int main(void)
 {
+    //get_score("31.134.188.51");
     EnableDebugPrivilages();
     main_page();
     return 0;

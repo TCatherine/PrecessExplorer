@@ -35,3 +35,4 @@ void get_section(DWORD pid, std::string path);
 void main_page();
 std::string is_eq(DWORD pid, std::string path);
 void show_entropy(std::string path);
+std::string get_score(std::string);

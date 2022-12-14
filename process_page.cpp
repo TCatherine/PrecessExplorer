@@ -32,6 +32,7 @@ void show_net(DWORD pid) {
             std::cout << "DESTINATIONN IP: " << info.table[i].remoteInfo << std::endl;
             std::string ip = info.table[i].remoteInfo.substr(0, info.table[i].remoteInfo.find_last_of(":"));
             std::cout << GetIpInfo(ip.c_str()) << std::endl;
+            std::cout << "IP SCORE: " << get_score(ip) << std::endl;
         }
     }
     for (int i = 0; i < udp_info.num; i++)
@@ -41,6 +42,7 @@ void show_net(DWORD pid) {
             std::cout << "DESTINATIONN IP: " << udp_info.table[i].remoteInfo << std::endl;
             std::string ip = udp_info.table[i].remoteInfo.substr(0, udp_info.table[i].remoteInfo.find_last_of(":"));
             std::cout << GetIpInfo(ip.c_str()) << std::endl;
+            std::cout << "IP SCORE: " << get_score(ip) << std::endl;
         }
     }
 }

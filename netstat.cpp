@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include "netstat.h"
+#include "GetIpInfo.h"
 
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "WS2_32.lib")
@@ -207,24 +208,28 @@ std::string is_net(DWORD pid) {
 
     GetExtendedTcpTable(NULL, &dwSize, TRUE, AF_INET, TCP_TABLE_OWNER_MODULE_ALL, 0);
     pTcpTable = (PMIB_TCPTABLE_OWNER_MODULE)calloc(dwSize, 1);
+    char szRemoteAddr[20] = { 0 };
     if (NULL == pTcpTable)
     {
-        printf("Error allocating memory\n");
-        return "false";
+        return "";
     }
 
     if (NO_ERROR != GetExtendedTcpTable(pTcpTable, &dwSize, TRUE, AF_INET, TCP_TABLE_OWNER_MODULE_ALL, 0))
     {
-        printf("\tGetTcpTable failed\n");
         free(pTcpTable);
-        return "false";
+        return "";
     }
 
     for (int i = 0; i < (int)pTcpTable->dwNumEntries; i++) {
         if (pid != pTcpTable->table[i].dwOwningPid) {
             continue;
         }
-        return "true";
+        struct in_addr IpAddr;
+        IpAddr.S_un.S_addr = (u_long)pTcpTable->table[i].dwRemoteAddr;
+        strcpy_s(szRemoteAddr, sizeof(szRemoteAddr), inet_ntoa(IpAddr));
+        std::string res = szRemoteAddr;
+        std::string ip = res.substr(0, res.find_last_of(":"));
+        return  get_score(ip);
     }
 
 
@@ -235,15 +240,14 @@ std::string is_net(DWORD pid) {
     pUdpTable = (PMIB_UDPTABLE_OWNER_MODULE)calloc(dwSize, 1);
     if (NULL == pUdpTable)
     {
-        printf("Error allocating memory\n");
-        return "false";
+        return "";
     }
 
     if (NO_ERROR != GetExtendedUdpTable(pUdpTable, &dwSize, true, AF_INET, UDP_TABLE_OWNER_MODULE, 0))
     {
         printf("\tGetUdpTable failed\n");
         free(pUdpTable);
-        return "false";
+        return "";
     }
 
 
@@ -251,11 +255,12 @@ std::string is_net(DWORD pid) {
         if (pid != pUdpTable->table[i].dwOwningPid) {
             continue;
         }
-        return "true";
+
+        return "0";
     }
 
 
-    return "false";
+    return "";
 }
 
 int GetNetstat(DWORD pid)

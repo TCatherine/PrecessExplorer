@@ -21,7 +21,7 @@ void init(HANDLE hProcess) {
 
 void show_main() {
     VariadicTable<std::string, DWORD, std::string, std::string, std::string, std::string, std::string, std::string >
-        vt({ "Name", "PID", "Verified", "Packed", "RWX", "Net", "Modified", "Malware"});
+        vt({ "Name", "PID", "Verified", "Packed", "RWX", "IP score", "Modified", "Malware"});
     PeSignatureVerifier checker = PeSignatureVerifier();
 
     DWORD aProcesses[1024], cbNeeded, cProcesses;
